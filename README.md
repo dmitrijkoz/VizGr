@@ -22,6 +22,11 @@
 
 ### Windows
 
+Запуск без параметров (например, через конфигурацию PyCharm `cmd.exe /c run.bat`) использует демонстрационные значения: пакет `demo-app`, файл `test-repository.json` и режим `local`.
+
+```bat
+run.bat
+```
 
 ```sh
 py main.py --package demo-app --repository test-repository.json --test-repo-mode local --max-depth 2 --filter demo
@@ -79,13 +84,23 @@ py main.py --package demo-app --repository test-repository.json --test-repo-mode
 
 ## Тестирование
 
+Запусти модульные тесты из корня репозитория:
+
 ```sh
 py -m unittest discover -s tests -v
 ```
 
 ## Структура проекта
 
-- `main.py` — аргументы CLI, валидация конфигурации и вывод `ключ=значение`.
-- `test-repository.json` — небольшой учебный файл репозитория для успешного запуска.
-- `tests/test_config.py` — модульные тесты корректной конфигурации и ошибок параметров.
-- `run.bat` — скрипт запуска.
+- `src/config.py` — модель настроек и валидация.
+- `src/cli.py` — аргументы CLI и вывод конфигурации.
+- `src/__init__.py` — описание Python-пакета.
+- `main.py` — совместимая точка входа для запуска из корня проекта.
+- `test-repository.json` — учебный файл репозитория для демонстрации.
+- `tests/test_config.py` — модульные тесты настроек и обработки ошибок.
+- `run.bat`, `run.sh` — скрипты запуска для Windows и Linux/macOS.
+- `pyproject.toml` — правила Ruff: строки до 80 символов и сложность до 10.
+
+### Запуск через Проводник Windows
+
+`run.bat` ожидает нажатия любой клавиши после завершения приложения, чтобы окно консоли не закрывалось сразу. Код завершения Python сохраняется и возвращается после нажатия клавиши.
