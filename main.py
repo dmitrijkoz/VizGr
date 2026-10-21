@@ -4,12 +4,12 @@ from pathlib import Path
 SOURCE_DIR = Path(__file__).resolve().parent / "src"
 if str(SOURCE_DIR) not in sys.path:
     sys.path.insert(0, str(SOURCE_DIR))
-from src.cli import (  # noqa: E402
+from src.cli import (
     build_parser,
     main,
     print_config,
 )
-from src.config import (  # noqa: E402
+from src.config import (
     AppConfig,
     ConfigError,
     MODES,
