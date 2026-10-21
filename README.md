@@ -22,20 +22,15 @@
 
 ### Windows
 
-```bat
-run.bat --package demo-app --repository test-repository.json --test-repo-mode local --max-depth 2 --filter demo
-```
-
-### Linux / macOS
 
 ```sh
-./run.sh --package demo-app --repository test-repository.json --test-repo-mode local --max-depth 2 --filter demo
+py main.py --package demo-app --repository test-repository.json --test-repo-mode local --max-depth 2 --filter demo
 ```
 
 ### Посмотреть справку
 
 ```sh
-python main.py --help
+py main.py --help
 ```
 
 ### Пример вывода
@@ -58,26 +53,26 @@ resolved_repository_mode=local
 
 ```sh
 # Нет обязательного имени пакета
-python main.py --repository test-repository.json
+py main.py --repository test-repository.json
 
 # Нет обязательного репозитория
-python main.py --package demo-app
+py main.py --package demo-app
 
 # Файл не существует
-python main.py --package demo-app --repository missing.json
+py main.py --package demo-app --repository missing.json
 
 # Недопустимый режим
-python main.py --package demo-app --repository test-repository.json --test-repo-mode production
+py main.py --package demo-app --repository test-repository.json --test-repo-mode production
 
 # Глубина не может быть отрицательной или нецелой
-python main.py --package demo-app --repository test-repository.json --max-depth -1
-python main.py --package demo-app --repository test-repository.json --max-depth abc
+py main.py --package demo-app --repository test-repository.json --max-depth -1
+py main.py --package demo-app --repository test-repository.json --max-depth abc
 
 # Пустая подстрока фильтра недопустима
-python main.py --package demo-app --repository test-repository.json --filter ""
+py main.py --package demo-app --repository test-repository.json --filter ""
 
 # Тип источника не соответствует указанному режиму
-python main.py --package demo-app --repository test-repository.json --test-repo-mode remote
+py main.py --package demo-app --repository test-repository.json --test-repo-mode remote
 ```
 
 При ошибке приложение выводит сообщение в `stderr` и завершает работу с кодом `2`.
@@ -85,7 +80,7 @@ python main.py --package demo-app --repository test-repository.json --test-repo-
 ## Тестирование
 
 ```sh
-python -m unittest discover -s tests -v
+py -m unittest discover -s tests -v
 ```
 
 ## Структура проекта
@@ -93,4 +88,4 @@ python -m unittest discover -s tests -v
 - `main.py` — аргументы CLI, валидация конфигурации и вывод `ключ=значение`.
 - `test-repository.json` — небольшой учебный файл репозитория для успешного запуска.
 - `tests/test_config.py` — модульные тесты корректной конфигурации и ошибок параметров.
-- `run.bat`, `run.sh` — скрипты запуска.
+- `run.bat` — скрипт запуска.

@@ -1,17 +1,10 @@
-"""Minimal CLI prototype for a package dependency graph visualizer (stage 1)."""
-
 from __future__ import annotations
-
 import argparse
 from dataclasses import dataclass
 from pathlib import Path
 from urllib.parse import urlparse
 from typing import Sequence
-
-
 MODES = ("auto", "local", "remote")
-
-
 @dataclass(frozen=True)
 class AppConfig:
     package_name: str
@@ -20,14 +13,9 @@ class AppConfig:
     resolved_repo_mode: str
     max_depth: int
     package_filter: str | None
-
-
 class ConfigError(ValueError):
     """Raised when one or more user-supplied options are invalid."""
-
-
 def non_negative_int(value: str) -> int:
-    """argparse type: accept integer dependency depths >= 0."""
     try:
         parsed = int(value, 10)
     except ValueError as exc:
@@ -37,39 +25,29 @@ def non_negative_int(value: str) -> int:
     if parsed < 0:
         raise argparse.ArgumentTypeError("должно быть не меньше 0")
     return parsed
-
-
 def is_http_url(value: str) -> bool:
     parsed = urlparse(value)
     return parsed.scheme.lower() in {"http", "https"} and bool(parsed.hostname)
-
-
 def validate_config(args: argparse.Namespace) -> AppConfig:
-    """Validate all options and normalize repository information."""
     package_name = (args.package or "").strip()
     if not package_name:
         raise ConfigError("параметр --package обязателен и не должен быть пустым.")
-
     raw_repository = (args.repository or "").strip()
     if not raw_repository:
         raise ConfigError("параметр --repository обязателен и не должен быть пустым.")
-
     mode = (args.test_repo_mode or "auto").strip().lower()
     if mode not in MODES:
         allowed = ", ".join(MODES)
         raise ConfigError(
             f"параметр --test-repo-mode должен принимать одно из значений: {allowed}."
         )
-
     is_url = is_http_url(raw_repository)
     looks_like_url = "://" in raw_repository
-
     if looks_like_url and not is_url:
         raise ConfigError(
             "параметр --repository содержит некорректный URL; "
             "поддерживаются URL с протоколом http:// или https:// и именем хоста."
         )
-
     if mode == "remote":
         if not is_url:
             raise ConfigError(
@@ -82,7 +60,6 @@ def validate_config(args: argparse.Namespace) -> AppConfig:
             raise ConfigError(
                 "для режима local параметр --repository должен указывать на локальный файл, а не URL."
             )
-
         if is_url and mode == "auto":
             normalized_repository = raw_repository
             resolved_mode = "remote"
@@ -105,7 +82,6 @@ def validate_config(args: argparse.Namespace) -> AppConfig:
                 ) from exc
             normalized_repository = str(repo_path.resolve())
             resolved_mode = "local"
-
     package_filter = args.package_filter
     if package_filter is not None:
         package_filter = package_filter.strip()
@@ -113,12 +89,9 @@ def validate_config(args: argparse.Namespace) -> AppConfig:
             raise ConfigError(
                 "параметр --filter не должен быть пустым; чтобы отключить фильтр, не указывайте его."
             )
-
     max_depth = args.max_depth
     if max_depth is None or max_depth < 0:
-        # Defensive check: argparse normally ensures max_depth is a non-negative integer.
         raise ConfigError("параметр --max-depth должен быть целым числом не меньше 0.")
-
     return AppConfig(
         package_name=package_name,
         repository=normalized_repository,
@@ -127,8 +100,6 @@ def validate_config(args: argparse.Namespace) -> AppConfig:
         max_depth=max_depth,
         package_filter=package_filter,
     )
-
-
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         description=(
@@ -167,10 +138,7 @@ def build_parser() -> argparse.ArgumentParser:
         help="необязательная подстрока для фильтрации пакетов",
     )
     return parser
-
-
 def print_config(config: AppConfig) -> None:
-    """Print every configurable user option as key=value pairs."""
     print("Параметры запуска:")
     print(f"package={config.package_name}")
     print(f"repository={config.repository}")
@@ -180,8 +148,6 @@ def print_config(config: AppConfig) -> None:
     print(f"resolved_repository_mode={config.resolved_repo_mode}")
     print()
     print("Конфигурация проверена успешно. Анализ зависимостей будет добавлен на следующих этапах.")
-
-
 def main(argv: Sequence[str] | None = None) -> int:
     parser = build_parser()
     args = parser.parse_args(argv)
@@ -191,7 +157,5 @@ def main(argv: Sequence[str] | None = None) -> int:
         parser.error(str(exc))
     print_config(config)
     return 0
-
-
 if __name__ == "__main__":
     raise SystemExit(main())
