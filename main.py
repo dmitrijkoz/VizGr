@@ -14,7 +14,7 @@ class AppConfig:
     max_depth: int
     package_filter: str | None
 class ConfigError(ValueError):
-    """Raised when one or more user-supplied options are invalid."""
+    pass
 def non_negative_int(value: str) -> int:
     try:
         parsed = int(value, 10)
