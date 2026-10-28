@@ -44,13 +44,17 @@ class ConfigValidationTests(unittest.TestCase):
         self.assertEqual(config.max_depth, 2)
         self.assertEqual(config.package_filter, "demo")
     def test_missing_package_is_rejected(self) -> None:
-        with self.assertRaises(SystemExit) as exc:
-            main.main(["--repository", str(self.repo_file)])
-        self.assertEqual(exc.exception.code, 2)
+        errors = io.StringIO()
+        with contextlib.redirect_stderr(errors):
+            result = main.main(["--repository", str(self.repo_file)])
+        self.assertEqual(result, 2)
+        self.assertIn("--package", errors.getvalue())
     def test_missing_repository_is_rejected(self) -> None:
-        with self.assertRaises(SystemExit) as exc:
-            main.main(["--package", "demo-app"])
-        self.assertEqual(exc.exception.code, 2)
+        errors = io.StringIO()
+        with contextlib.redirect_stderr(errors):
+            result = main.main(["--package", "demo-app"])
+        self.assertEqual(result, 2)
+        self.assertIn("--repository", errors.getvalue())
     def test_whitespace_package_validation(self) -> None:
         args = self._parse_args()
         args.package = "   "

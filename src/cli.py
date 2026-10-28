@@ -7,6 +7,10 @@ from src.config import (
     non_negative_int,
     validate_config,
 )
+from npm_registry import (
+    RegistryError,
+    fetch_direct_dependencies,
+)
 def build_parser() -> argparse.ArgumentParser:
     description = (
         "Минимальный CLI-прототип визуализатора графа зависимостей. "
@@ -65,15 +69,40 @@ def print_config(config: AppConfig) -> None:
     print(f"max_depth={config.max_depth}")
     print(f"package_filter={package_filter}")
     print(f"resolved_repository_mode={config.resolved_repo_mode}")
+def _print_dependencies(
+    dependencies: dict[str, str],
+    package_filter: str | None,
+) -> None:
+    filtered = {
+        name: version
+        for name, version in dependencies.items()
+        if not package_filter or package_filter.lower() in name.lower()
+    }
     print()
-    print("Конфигурация проверена успешно.")
-    print("Анализ зависимостей будет добавлен на следующих этапах.")
+    print(f"Прямые зависимости: {len(filtered)}")
+    if not filtered:
+        print("Зависимости не найдены.")
+        return
+    for name, version in filtered.items():
+        print(f"{name} = {version}")
 def main(argv: Sequence[str] | None = None) -> int:
     parser = build_parser()
     args = parser.parse_args(argv)
     try:
         config = validate_config(args)
-    except ConfigError as exc:
-        parser.error(str(exc))
-    print_config(config)
+        print_config(config)
+        if config.resolved_repo_mode != "remote":
+            raise ConfigError(
+                "Для этапа 2 укажи URL реестра npm, "
+                "например https://registry.npmjs.org"
+            )
+        version, dependencies = fetch_direct_dependencies(
+            config.repository,
+            config.package_name,
+        )
+        print(f"package_version={version}")
+        _print_dependencies(dependencies, config.package_filter)
+    except (ConfigError, RegistryError) as exc:
+        print(f"Ошибка: {exc}", file=__import__("sys").stderr)
+        return 2
     return 0

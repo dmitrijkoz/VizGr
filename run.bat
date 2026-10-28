@@ -4,7 +4,7 @@ set "PYTHONUTF8=1"
 set "PYTHONIOENCODING=utf-8"
 cd /d "%~dp0"
 if "%~1"=="" (
-    py main.py --package demo-app --repository test-repository.json --test-repo-mode local
+    py main.py --package express --repository https://registry.npmjs.org --test-repo-mode remote --max-depth 2
 ) else (
     py main.py %*
 )
