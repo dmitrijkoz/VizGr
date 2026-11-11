@@ -3,6 +3,8 @@ import json
 from urllib.error import HTTPError, URLError
 from urllib.parse import quote, urlparse
 from urllib.request import Request, urlopen
+HTTP_NOT_FOUND = 404;
+REQUEST_TIMEOUT = 15;
 class RegistryError(ValueError):
     pass
 def _build_metadata_url(repository: str, package: str) -> str:
@@ -18,10 +20,10 @@ def _read_json(url: str) -> dict:
         headers={"Accept": "application/json"},
     )
     try:
-        with urlopen(request, timeout=15) as response:
+        with urlopen(request, timeout=REQUEST_TIMEOUT) as response:
             data = response.read()
     except HTTPError as exc:
-        if exc.code == 404:
+        if exc.code == HTTP_NOT_FOUND:
             raise RegistryError(
                 "Пакет не найден в указанном реестре npm."
             ) from exc

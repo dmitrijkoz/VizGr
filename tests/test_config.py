@@ -5,12 +5,14 @@ import unittest
 from pathlib import Path
 import main
 class ConfigValidationTests(unittest.TestCase):
-    def setUp(self) -> None:
+    def setup(self) -> None:
         self.temp_dir = tempfile.TemporaryDirectory()
         self.repo_file = Path(self.temp_dir.name) / "repo.json"
         self.repo_file.write_text('{"packages": []}', encoding="utf-8")
-    def tearDown(self) -> None:
+    setUp = setup;
+    def teardown(self) -> None:
         self.temp_dir.cleanup()
+    tearDown = teardown;
     def parse(self, *extra: str) -> int:
         argv = [
             "--package",
