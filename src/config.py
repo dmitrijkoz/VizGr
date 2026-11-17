@@ -1,20 +1,31 @@
 from __future__ import annotations
+
 import argparse
 from dataclasses import dataclass
 from pathlib import Path
 from urllib.parse import urlparse
+
 MODES = ("auto", "local", "remote")
+
+
 @dataclass(frozen=True)
 class AppConfig:
+    """Проверенная конфигурация запуска приложения."""
+
     package_name: str
     repository: str
     test_repo_mode: str
     resolved_repo_mode: str
     max_depth: int
     package_filter: str | None
+
+
 class ConfigError(ValueError):
-    pass
+    """Ошибка параметров командной строки."""
+
+
 def non_negative_int(value: str) -> int:
+    """Преобразует значение аргумента в неотрицательное целое число."""
     try:
         parsed = int(value, 10)
     except ValueError as exc:
@@ -23,7 +34,10 @@ def non_negative_int(value: str) -> int:
     if parsed < 0:
         raise argparse.ArgumentTypeError("должно быть не меньше 0")
     return parsed
+
+
 def is_http_url(value: str) -> bool:
+    """Проверяет, является ли строка корректным HTTP(S)-адресом."""
     try:
         parsed = urlparse(value)
         hostname = parsed.hostname
@@ -31,6 +45,8 @@ def is_http_url(value: str) -> bool:
         return False
     valid_scheme = parsed.scheme.lower() in {"http", "https"}
     return valid_scheme and bool(hostname)
+
+
 def _validate_package(value: str | None) -> str:
     package_name = (value or "").strip()
     if not package_name:
@@ -38,6 +54,8 @@ def _validate_package(value: str | None) -> str:
             "параметр --package обязателен и не должен быть пустым."
         )
     return package_name
+
+
 def _validate_repository_text(value: str | None) -> str:
     repository = (value or "").strip()
     if not repository:
@@ -45,6 +63,8 @@ def _validate_repository_text(value: str | None) -> str:
             "параметр --repository обязателен и не должен быть пустым."
         )
     return repository
+
+
 def _validate_mode(value: str | None) -> str:
     mode = (value or "auto").strip().lower()
     if mode not in MODES:
@@ -54,6 +74,8 @@ def _validate_mode(value: str | None) -> str:
             f"{allowed}."
         )
     return mode
+
+
 def _validate_local_repository(repository: str) -> str:
     repo_path = Path(repository).expanduser()
     if not repo_path.exists():
@@ -74,6 +96,8 @@ def _validate_local_repository(repository: str) -> str:
             f"{repository!r}."
         ) from exc
     return str(repo_path.resolve())
+
+
 def _resolve_repository(repository: str, mode: str) -> tuple[str, str]:
     is_url = is_http_url(repository)
     looks_like_url = "://" in repository
@@ -97,6 +121,8 @@ def _resolve_repository(repository: str, mode: str) -> tuple[str, str]:
     if is_url:
         return repository, "remote"
     return _validate_local_repository(repository), "local"
+
+
 def _validate_filter(value: str | None) -> str | None:
     if value is None:
         return None
@@ -107,13 +133,18 @@ def _validate_filter(value: str | None) -> str | None:
             "фильтр, не указывайте его."
         )
     return package_filter
+
+
 def _validate_depth(value: int | None) -> int:
     if value is None or value < 0:
         raise ConfigError(
             "параметр --max-depth должен быть целым числом не меньше 0."
         )
     return value
+
+
 def validate_config(args: argparse.Namespace) -> AppConfig:
+    """Проверяет аргументы и определяет тип источника данных."""
     package_name = _validate_package(args.package)
     repository = _validate_repository_text(args.repository)
     mode = _validate_mode(args.test_repo_mode)

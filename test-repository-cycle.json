@@ -1,0 +1,10 @@
+{
+  "repository_name": "cycle-demo",
+  "description": "Тестовый граф с циклом A -> B -> C -> A.",
+  "packages": [
+    {"name": "A", "dependencies": ["B"]},
+    {"name": "B", "dependencies": ["C"]},
+    {"name": "C", "dependencies": ["A", "D"]},
+    {"name": "D", "dependencies": []}
+  ]
+}

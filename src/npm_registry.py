@@ -1,12 +1,18 @@
 from __future__ import annotations
+
 import json
 from urllib.error import HTTPError, URLError
 from urllib.parse import quote, urlparse
 from urllib.request import Request, urlopen
-HTTP_NOT_FOUND = 404;
-REQUEST_TIMEOUT = 15;
+
+HTTP_NOT_FOUND = 404
+REQUEST_TIMEOUT = 15
+
+
 class RegistryError(ValueError):
-    pass
+    """Ошибка получения метаданных из реестра npm."""
+
+
 def _build_metadata_url(repository: str, package: str) -> str:
     base = repository.rstrip("/")
     parsed = urlparse(base)
@@ -14,11 +20,10 @@ def _build_metadata_url(repository: str, package: str) -> str:
         raise RegistryError("Указан некорректный URL реестра npm.")
     encoded_package = quote(package, safe="@")
     return f"{base}/{encoded_package}"
+
+
 def _read_json(url: str) -> dict:
-    request = Request(
-        url,
-        headers={"Accept": "application/json"},
-    )
+    request = Request(url, headers={"Accept": "application/json"})
     try:
         with urlopen(request, timeout=REQUEST_TIMEOUT) as response:
             data = response.read()
@@ -43,10 +48,13 @@ def _read_json(url: str) -> dict:
     if not isinstance(result, dict):
         raise RegistryError("Формат метаданных npm некорректен.")
     return result
+
+
 def fetch_direct_dependencies(
     repository: str,
     package: str,
 ) -> tuple[str, dict[str, str]]:
+    """Получает последнюю версию пакета и его прямые зависимости."""
     url = _build_metadata_url(repository, package)
     metadata = _read_json(url)
     dist_tags = metadata.get("dist-tags", {})

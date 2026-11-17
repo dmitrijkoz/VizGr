@@ -1,0 +1,10 @@
+{
+  "repository_name": "linear-demo",
+  "description": "Линейный тестовый граф A -> B -> C -> D.",
+  "packages": [
+    {"name": "A", "dependencies": ["B"]},
+    {"name": "B", "dependencies": ["C"]},
+    {"name": "C", "dependencies": ["D"]},
+    {"name": "D", "dependencies": []}
+  ]
+}

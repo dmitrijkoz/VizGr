@@ -1,14 +1,14 @@
 from __future__ import annotations
+
 import sys
 from pathlib import Path
+
 SOURCE_DIR = Path(__file__).resolve().parent / "src"
+
 if str(SOURCE_DIR) not in sys.path:
     sys.path.insert(0, str(SOURCE_DIR))
-from src.cli import (
-    build_parser,
-    main,
-    print_config,
-)
+
+from src.cli import build_parser, main, print_config
 from src.config import (
     AppConfig,
     ConfigError,
@@ -17,16 +17,26 @@ from src.config import (
     non_negative_int,
     validate_config,
 )
+from src.dependency_graph import (
+    GraphError,
+    build_dependency_graph,
+    load_test_repository,
+)
+
 __all__ = [
     "AppConfig",
     "ConfigError",
+    "GraphError",
     "MODES",
+    "build_dependency_graph",
     "build_parser",
     "is_http_url",
+    "load_test_repository",
     "main",
     "non_negative_int",
     "print_config",
     "validate_config",
 ]
+
 if __name__ == "__main__":
     raise SystemExit(main())

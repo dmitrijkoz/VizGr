@@ -1,26 +1,12 @@
 {
-  "repository_name": "demo-test-repository",
-  "description": "Учебный тестовый репозиторий для следующих этапов проекта.",
+  "repository_name": "branching-demo",
+  "description": "Тестовый граф с ветвлением и общей транзитивной зависимостью.",
   "packages": [
-    {
-      "name": "demo-app",
-      "version": "1.0.0",
-      "dependencies": ["demo-core", "demo-utils"]
-    },
-    {
-      "name": "demo-core",
-      "version": "1.2.0",
-      "dependencies": ["demo-utils"]
-    },
-    {
-      "name": "demo-utils",
-      "version": "2.0.0",
-      "dependencies": []
-    },
-    {
-      "name": "demo-test",
-      "version": "0.1.0",
-      "dependencies": ["demo-core"]
-    }
+    {"name": "A", "dependencies": ["B", "C"]},
+    {"name": "B", "dependencies": ["D"]},
+    {"name": "C", "dependencies": ["D", "E"]},
+    {"name": "D", "dependencies": ["F"]},
+    {"name": "E", "dependencies": []},
+    {"name": "F", "dependencies": []}
   ]
 }
